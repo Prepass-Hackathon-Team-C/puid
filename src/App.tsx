@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  Shield,
-  User,
-  Copy,
-  Check,
-  ChevronRight,
-  RefreshCw,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Shield, Copy, Check, ChevronRight, Plus, Trash2 } from "lucide-react";
 
 // Define step types
 type Step = "questions" | "review";
