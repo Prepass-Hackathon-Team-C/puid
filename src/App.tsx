@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Shield } from "lucide-react";
 import { Step, SecurityQuestion } from "./types";
 import { availableQuestions } from "./constants";
@@ -14,10 +14,18 @@ function App() {
   const [prefixCode, setPrefixCode] = useState("");
   const [nextQuestionId, setNextQuestionId] = useState(2); // Start at 2 since we have one initial question
 
-  // Questions state
-  const [questions, setQuestions] = useState<SecurityQuestion[]>([
-    { id: "1", question: availableQuestions[0], answer: "" },
-  ]);
+  // Modify questions state to load from localStorage
+  const [questions, setQuestions] = useState<SecurityQuestion[]>(() => {
+    const savedQuestions = localStorage.getItem('puid-questions');
+    return savedQuestions ? JSON.parse(savedQuestions) : [
+      { id: "1", question: availableQuestions[0], answer: "" },
+    ];
+  });
+
+  // Add effect to save questions whenever they change
+  useEffect(() => {
+    localStorage.setItem('puid-questions', JSON.stringify(questions));
+  }, [questions]);
 
   // PUID state
   const [puid, setPuid] = useState("");
@@ -114,19 +122,119 @@ function App() {
     setPuid(newPuid);
   };
 
-  // Render current step content
+  // Add new download function
+  const handleDownloadProfile = async () => {
+    const questionsData = localStorage.getItem('puid-questions');
+    if (!questionsData) return;
+
+    try {
+      // Check if the File System Access API is available
+      if ('showSaveFilePicker' in window) {
+        const fileHandle = await window.showSaveFilePicker({
+          suggestedName: 'puid-profile.json',
+          types: [{
+            description: 'JSON File',
+            accept: {
+              'application/json': ['.json'],
+            },
+          }],
+        });
+        
+        const writable = await fileHandle.createWritable();
+        await writable.write(questionsData);
+        await writable.close();
+      } else {
+        // Fallback for browsers that don't support File System Access API
+        const blob = new Blob([questionsData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'puid-profile.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Failed to save file:', err);
+      // Fallback to the original method if the user cancels or there's an error
+      const blob = new Blob([questionsData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'puid-profile.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  // Add new import function
+  const handleImportProfile = async (file: File) => {
+    try {
+      const fileContent = await file.text();
+      const importedData = JSON.parse(fileContent);
+      
+      if (Array.isArray(importedData) && importedData.length > 0) {
+        // Validate that imported data has the correct structure
+        const isValidData = importedData.every((item: any) => 
+          typeof item === 'object' && 
+          'id' in item && 
+          'question' in item && 
+          'answer' in item
+        );
+
+        if (isValidData) {
+          setQuestions(importedData);
+          // Update nextQuestionId to be higher than any existing id
+          const maxId = Math.max(...importedData.map(q => parseInt(q.id)));
+          setNextQuestionId(maxId + 1);
+        } else {
+          alert('Invalid file format. Please use a valid PUID profile JSON file.');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to import file:', err);
+      alert('Failed to import file. Please make sure it is a valid JSON file.');
+    }
+  };
+
+  // Modify renderStepContent to pass the new import handler
   const renderStepContent = () => {
     switch (currentStep) {
       case "questions":
         return (
-          <QuestionForm
-            questions={questions}
-            onQuestionChange={handleQuestionChange}
-            onAnswerChange={handleAnswerChange}
-            onAddQuestion={addQuestion}
-            onRemoveQuestion={removeQuestion}
-            getAvailableQuestionsForId={getAvailableQuestionsForId}
-          />
+          <>
+            <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Import Profile</h3>
+                  <p className="text-sm text-gray-500">Load your saved PUID profile</p>
+                </div>
+                <label className="cursor-pointer px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
+                  Import PUID Profile
+                  <input
+                    type="file"
+                    accept=".json"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImportProfile(file);
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+            <QuestionForm
+              questions={questions}
+              onQuestionChange={handleQuestionChange}
+              onAnswerChange={handleAnswerChange}
+              onAddQuestion={addQuestion}
+              onRemoveQuestion={removeQuestion}
+              getAvailableQuestionsForId={getAvailableQuestionsForId}
+            />
+          </>
         );
       case "review":
         return (
@@ -137,6 +245,7 @@ function App() {
             onPrefixChange={setPrefixCode}
             onGeneratePUID={handleGeneratePUID}
             onCopyPUID={copyPUID}
+            onDownloadProfile={handleDownloadProfile}
           />
         );
       default:
