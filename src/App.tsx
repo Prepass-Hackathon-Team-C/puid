@@ -257,9 +257,9 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-4">
+    <div className="h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-4 overflow-hidden">
       <div className="h-full max-w-4xl mx-auto">
-        <div className="h-full bg-white rounded-xl shadow-lg flex flex-col">
+        <div className="h-full bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
           <div className="bg-indigo-600 py-3 px-6 text-white flex-shrink-0">
             <h1 className="text-2xl font-bold flex items-center justify-center">
               <Shield className="mr-2" />
@@ -267,12 +267,14 @@ function App() {
             </h1>
           </div>
 
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-6 pb-0 flex-shrink-0">
               <ProgressBar currentStep={currentStep} />
             </div>
 
-            <div className="p-6 flex-1 min-h-0">{renderStepContent()}</div>
+            <div className="p-6 flex-1 overflow-auto">
+              {renderStepContent()}
+            </div>
 
             {currentStep === "review" && (
               <div className="px-6 pb-6 flex-shrink-0">
