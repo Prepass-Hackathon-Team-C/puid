@@ -233,6 +233,9 @@ function App() {
               onAddQuestion={addQuestion}
               onRemoveQuestion={removeQuestion}
               getAvailableQuestionsForId={getAvailableQuestionsForId}
+              isStepComplete={isStepComplete()}
+              onStepChange={handleStepChange}
+              onStartOver={handleStartOver}
             />
           </>
         );
@@ -254,27 +257,32 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="bg-indigo-600 p-6 text-white">
+    <div className="h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-4">
+      <div className="h-full max-w-4xl mx-auto">
+        <div className="h-full bg-white rounded-xl shadow-lg flex flex-col">
+          <div className="bg-indigo-600 py-3 px-6 text-white flex-shrink-0">
             <h1 className="text-2xl font-bold flex items-center justify-center">
               <Shield className="mr-2" />
-              PUID Creator
+              PUID
             </h1>
           </div>
 
-          <div className="p-6">
-            <ProgressBar currentStep={currentStep} />
+          <div className="flex-1 flex flex-col min-h-0">
+            <div className="p-6 pb-0 flex-shrink-0">
+              <ProgressBar currentStep={currentStep} />
+            </div>
 
-            <div className="mt-6">{renderStepContent()}</div>
+            <div className="p-6 flex-1 min-h-0">{renderStepContent()}</div>
 
-            <NavigationButtons
-              currentStep={currentStep}
-              isStepComplete={isStepComplete()}
-              onStepChange={handleStepChange}
-              onStartOver={handleStartOver}
-            />
+            {currentStep === "review" && (
+              <div className="px-6 pb-6 flex-shrink-0">
+                <NavigationButtons
+                  currentStep={currentStep}
+                  isStepComplete={isStepComplete()}
+                  onStepChange={handleStepChange}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
