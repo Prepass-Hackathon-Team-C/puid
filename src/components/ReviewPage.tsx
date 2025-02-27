@@ -167,15 +167,30 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
               </div>
             </div>
           </label>
-          <input
-            type="number"
-            id="minLength"
-            value={minLength}
-            onChange={(e) => onMinLengthChange(Number(e.target.value))}
-            min={8}
-            max={256}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Minimum Length: {minLength}</span>
+              <span>{minLength} characters</span>
+            </div>
+            <input
+              type="range"
+              id="minLength"
+              value={minLength}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                const clampedValue = Math.min(Math.max(value, 6), 32);
+                onMinLengthChange(clampedValue);
+              }}
+              min={6}
+              max={32}
+              step={1}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+            />
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>6</span>
+              <span>32</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
