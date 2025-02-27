@@ -19,9 +19,9 @@ export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, 
 
   // Select enough words to reach target length (12-20 chars)
   const selectedWords: string[] = [];
-  let totalLength = 0;
+  let totalLength = prefixCode.length;
   const minLength = minimumLength;
-  const maxLength = minimumLength + 10;
+  const maxLength = minimumLength + 50;
 
   while (totalLength < minLength) {
     // Shuffle the words
@@ -29,17 +29,13 @@ export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, 
     for (const word of shuffledWords) {
       if (totalLength + word.length <= maxLength) {
         selectedWords.push(word);
-        totalLength += word.length;
-        if (totalLength >= minLength) break;
+        totalLength += word.length + 1;
       }
+      if (totalLength >= minLength) break;
     }
   }
 
-  // If we don't have enough length and there are more words, add one more
-  if (totalLength < minLength && shuffledWords.length > selectedWords.length) {
-    const nextWord = shuffledWords[selectedWords.length];
-    selectedWords.push(nextWord);
-  }
+  console.log(selectedWords);
 
   // Convert to lowercase
   let processedWords = selectedWords.map((word) => word.toLowerCase());
