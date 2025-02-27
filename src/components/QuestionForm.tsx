@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Plus, Trash2, ChevronRight } from "lucide-react";
 import { SecurityQuestion } from "../types";
-import { availableQuestions } from "../constants";
 
 interface QuestionFormProps {
   questions: SecurityQuestion[];
