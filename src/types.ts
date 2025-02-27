@@ -8,6 +8,12 @@ export interface SecurityQuestion {
   answer: string;
 }
 
+// Define profile type
+export interface Profile {
+  questions: SecurityQuestion[];
+  usedPrefixCodes: string[];
+}
+
 // File System Access API types
 interface FileSystemSaveOptions {
   suggestedName?: string;
