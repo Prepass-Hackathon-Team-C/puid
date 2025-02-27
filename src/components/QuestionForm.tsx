@@ -13,6 +13,8 @@ interface QuestionFormProps {
   isStepComplete: boolean;
   onStepChange: (step: "review") => void;
   onStartOver: () => void;
+  onImportProfile: (file: File) => Promise<void>;
+  onDownloadProfile: () => Promise<void>;
 }
 
 export const QuestionForm: React.FC<QuestionFormProps> = ({
@@ -25,9 +27,11 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   isStepComplete,
   onStepChange,
   onStartOver,
+  onImportProfile,
+  onDownloadProfile,
 }) => {
   return (
-    <div className="h-full flex">
+    <div className="h-full flex flex-col md:flex-row">
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-shrink-0 mb-6">
           <h2 className="text-xl font-semibold text-gray-900">Profile</h2>
@@ -35,7 +39,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
         <div className="flex-1 min-h-0">
           <div className="h-full overflow-y-auto">
-            <div className="space-y-4 pr-4 pb-4">
+            <div className="space-y-4 md:pr-4 pb-4">
               {questions.map((q) => (
                 <div
                   key={q.id}
@@ -94,17 +98,35 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         </div>
       </div>
 
-      <div className="ml-6 flex flex-col justify-end gap-4">
+      <div className="mt-6 md:mt-0 md:ml-6 flex flex-row flex-wrap md:flex-col justify-end items-stretch gap-4 md:w-auto w-full">
+        <label className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center cursor-pointer">
+          Import
+          <input
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onImportProfile(file);
+            }}
+          />
+        </label>
+        <button
+          onClick={onDownloadProfile}
+          className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+        >
+          Export
+        </button>
         <button
           onClick={onStartOver}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center"
+          className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center"
         >
-          Clear Profile
+          Clear
         </button>
         <button
           onClick={() => onStepChange("review")}
           disabled={!isStepComplete}
-          className={`px-4 py-2 rounded-md flex items-center ${
+          className={`basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 rounded-md flex items-center justify-center ${
             isStepComplete
               ? "bg-indigo-600 text-white hover:bg-indigo-700"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
