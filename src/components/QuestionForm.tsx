@@ -38,7 +38,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         </div>
 
         <div className="flex-1 min-h-0">
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
             <div className="space-y-4 md:pr-4 pb-4">
               {questions.map((q) => (
                 <div
