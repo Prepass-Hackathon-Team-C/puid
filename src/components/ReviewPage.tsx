@@ -13,6 +13,9 @@ interface ReviewPageProps {
   onMinLengthChange: (value: number) => void;
   onAcceptPUID: () => void;
   onStartOver: () => void;
+  allowedSpecialChars: string[];
+  availableSpecialChars: string[];
+  onSpecialCharsChange: (chars: string[]) => void;
 }
 
 export const ReviewPage: React.FC<ReviewPageProps> = ({
@@ -27,6 +30,9 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   onMinLengthChange,
   onAcceptPUID,
   onStartOver,
+  allowedSpecialChars,
+  onSpecialCharsChange,
+  availableSpecialChars,
 }) => {
   const [isAccepted, setIsAccepted] = useState(false);
 
@@ -190,6 +196,57 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
               <span>6</span>
               <span>32</span>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+            Allowed Special Characters
+            <div className="relative group">
+              <Info
+                size={14}
+                className="text-gray-400 hover:text-gray-600 cursor-help"
+              />
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                Allowed special characters in the password.
+                <div className="absolute left-1/2 -translate-x-1/2 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                ${allowedSpecialChars.length === availableSpecialChars.length 
+                  ? 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              onClick={() => {
+                if (allowedSpecialChars.length === availableSpecialChars.length) {
+                  onSpecialCharsChange([]);
+                } else {
+                  onSpecialCharsChange([...availableSpecialChars]);
+                }
+              }}
+            >
+              {allowedSpecialChars.length === availableSpecialChars.length ? 'Clear All' : 'Select All'}
+            </button>
+            {availableSpecialChars.map((char) => (
+              <button
+                key={char}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                  ${allowedSpecialChars.includes(char)
+                    ? 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                onClick={() => {
+                  if (allowedSpecialChars.includes(char)) {
+                    onSpecialCharsChange(allowedSpecialChars.filter((c) => c !== char));
+                  } else {
+                    onSpecialCharsChange([...allowedSpecialChars, char]);
+                  }
+                }}
+              >
+                {char}
+              </button>
+            ))}
           </div>
         </div>
       </div>

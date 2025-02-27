@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Shield } from "lucide-react";
 import { Step, SecurityQuestion, Profile } from "./types";
-import { availableQuestions } from "./constants";
+import { availableQuestions, separators } from "./constants";
 import { generatePUID } from "./utils/puidGenerator";
 import { ProgressBar } from "./components/ProgressBar";
 import { QuestionForm } from "./components/QuestionForm";
@@ -14,6 +14,7 @@ function App() {
   const [prefixCode, setPrefixCode] = useState("");
   const [nextQuestionId, setNextQuestionId] = useState(2); // Start at 2 since we have one initial question
   const [prefixError, setPrefixError] = useState<string | null>(null);
+  const [allowedSpecialChars, setAllowedSpecialChars] = useState<string[]>(separators);
 
   // Load profile from localStorage
   const [profile, setProfile] = useState<Profile>(() => {
@@ -150,7 +151,7 @@ function App() {
 
   // Handle PUID generation
   const handleGeneratePUID = () => {
-    const newPuid = generatePUID(questions, prefixCode, minimumLength);
+    const newPuid = generatePUID(questions, prefixCode, minimumLength, allowedSpecialChars);
     setPuid(newPuid);
   };
 
@@ -301,6 +302,9 @@ function App() {
             onCopyPUID={copyPUID}
             onAcceptPUID={handleAcceptPUID}
             onStartOver={handleResetGeneration}
+            allowedSpecialChars={allowedSpecialChars}
+            onSpecialCharsChange={setAllowedSpecialChars}
+            availableSpecialChars={separators}
           />
         );
       default:

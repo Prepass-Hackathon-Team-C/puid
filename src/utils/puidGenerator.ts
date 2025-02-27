@@ -1,10 +1,10 @@
 import { SecurityQuestion } from '../types';
-import { separators, numberReplacements } from '../constants';
+import { numberReplacements } from '../constants';
 
-export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, minimumLength: number): string => {
+export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, minimumLength: number, allowedSpecialChars: string[]): string => {
   // Choose one random separator to use throughout
-  const selectedSeparator =
-    separators[Math.floor(Math.random() * separators.length)];
+  const selectedSeparator = allowedSpecialChars?.length ?
+    allowedSpecialChars[Math.floor(Math.random() * allowedSpecialChars.length)] : '';
 
   // Get all answers and split them into words
   const answers = questions
@@ -29,13 +29,11 @@ export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, 
     for (const word of shuffledWords) {
       if (totalLength + word.length <= maxLength) {
         selectedWords.push(word);
-        totalLength += word.length + 1;
+        totalLength += word.length + selectedSeparator.length;
       }
       if (totalLength >= minLength) break;
     }
   }
-
-  console.log(selectedWords);
 
   // Convert to lowercase
   let processedWords = selectedWords.map((word) => word.toLowerCase());
