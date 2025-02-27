@@ -230,8 +230,14 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
           </label>
           <div className="relative">
             <div
-              className="min-h-[42px] w-full px-3 py-2 border border-gray-300 rounded-md bg-white cursor-pointer flex flex-wrap gap-1"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="min-h-[42px] w-full px-3 py-2 border border-gray-300 rounded-md bg-white cursor-pointer flex flex-wrap gap-1 special-chars-dropdown"
+              onClick={(e) => {
+                if (isDropdownOpen && e.target.closest('.special-chars-dropdown')) {
+                  setIsDropdownOpen(false);
+                } else {
+                  setIsDropdownOpen(true);
+                }
+              }}
             >
               {allowedSpecialChars.length > 0 ? (
                 allowedSpecialChars.map((char) => (

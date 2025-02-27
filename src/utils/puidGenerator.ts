@@ -3,9 +3,8 @@ import { numberReplacements } from '../constants';
 
 export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, minimumLength: number, allowedSpecialChars: string[]): string => {
   // Choose one random separator to use throughout
-  const separators = allowedSpecialChars?.length ? allowedSpecialChars : [' '];
-  const selectedSeparator =
-    separators[Math.floor(Math.random() * separators.length)];
+  const selectedSeparator = allowedSpecialChars?.length ?
+    allowedSpecialChars[Math.floor(Math.random() * allowedSpecialChars.length)] : '';
 
   // Get all answers and split them into words
   const answers = questions
@@ -30,7 +29,7 @@ export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, 
     for (const word of shuffledWords) {
       if (totalLength + word.length <= maxLength) {
         selectedWords.push(word);
-        totalLength += word.length + 1;
+        totalLength += word.length + selectedSeparator.length;
       }
       if (totalLength >= minLength) break;
     }
