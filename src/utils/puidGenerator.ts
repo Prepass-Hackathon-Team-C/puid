@@ -1,8 +1,9 @@
 import { SecurityQuestion } from '../types';
-import { separators, numberReplacements } from '../constants';
+import { numberReplacements } from '../constants';
 
-export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, minimumLength: number): string => {
+export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, minimumLength: number, allowedSpecialChars: string[]): string => {
   // Choose one random separator to use throughout
+  const separators = allowedSpecialChars?.length ? allowedSpecialChars : [' '];
   const selectedSeparator =
     separators[Math.floor(Math.random() * separators.length)];
 
