@@ -34,6 +34,9 @@ function App() {
     localStorage.setItem("puid-profile", JSON.stringify(profile));
   }, [profile]);
 
+  // Add this state near other state declarations
+  const [minimumLength, setMinimumLength] = useState(8);
+
   // Get available questions for a specific question ID
   const getAvailableQuestionsForId = (currentId: string) => {
     const selectedQuestions = questions
@@ -144,7 +147,7 @@ function App() {
 
   // Handle PUID generation
   const handleGeneratePUID = () => {
-    const newPuid = generatePUID(questions, prefixCode);
+    const newPuid = generatePUID(questions, prefixCode, minimumLength);
     setPuid(newPuid);
   };
 
@@ -288,6 +291,8 @@ function App() {
             prefixCode={prefixCode}
             prefixError={prefixError}
             copied={copied}
+            minLength={minimumLength}
+            onMinLengthChange={setMinimumLength}
             onPrefixChange={handlePrefixChange}
             onGeneratePUID={handleGeneratePUID}
             onCopyPUID={copyPUID}

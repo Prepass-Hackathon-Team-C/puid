@@ -9,6 +9,8 @@ interface ReviewPageProps {
   onPrefixChange: (value: string) => void;
   onGeneratePUID: () => void;
   onCopyPUID: () => void;
+  minLength: number;
+  onMinLengthChange: (value: number) => void;
   onAcceptPUID: () => void;
   onStartOver: () => void;
 }
@@ -21,6 +23,8 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   onPrefixChange,
   onGeneratePUID,
   onCopyPUID,
+  minLength,
+  onMinLengthChange,
   onAcceptPUID,
   onStartOver,
 }) => {
@@ -145,6 +149,34 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
             )}
           </>
         )}
+
+        <div className="mt-4">
+          <label
+            htmlFor="minLength"
+            className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"
+          >
+            Minimum Length
+            <div className="relative group">
+              <Info
+                size={14}
+                className="text-gray-400 hover:text-gray-600 cursor-help"
+              />
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                The minimum length of the password
+                <div className="absolute left-1/2 -translate-x-1/2 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
+          </label>
+          <input
+            type="number"
+            id="minLength"
+            value={minLength}
+            onChange={(e) => onMinLengthChange(Number(e.target.value))}
+            min={8}
+            max={256}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
       </div>
     </div>
   );
