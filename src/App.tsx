@@ -31,6 +31,9 @@ function App() {
   const [puid, setPuid] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // Add this state near other state declarations
+  const [minimumLength, setMinimumLength] = useState(8);
+
   // Get available questions for a specific question ID
   const getAvailableQuestionsForId = (currentId: string) => {
     const selectedQuestions = questions
@@ -118,7 +121,7 @@ function App() {
 
   // Handle PUID generation
   const handleGeneratePUID = () => {
-    const newPuid = generatePUID(questions, prefixCode);
+    const newPuid = generatePUID(questions, prefixCode, minimumLength);
     setPuid(newPuid);
   };
 
@@ -230,6 +233,8 @@ function App() {
             puid={puid}
             prefixCode={prefixCode}
             copied={copied}
+            minLength={minimumLength}
+            onMinLengthChange={setMinimumLength}
             onPrefixChange={setPrefixCode}
             onGeneratePUID={handleGeneratePUID}
             onCopyPUID={copyPUID}
