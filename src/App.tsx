@@ -64,7 +64,10 @@ function App() {
           { id: newId, question: availableQuestion, answer: "" },
         ],
       });
+
+      return newId; // Return the new question's ID
     }
+    return undefined;
   };
 
   // Remove question

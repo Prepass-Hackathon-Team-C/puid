@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Plus, Trash2, ChevronRight } from "lucide-react";
 import { SecurityQuestion } from "../types";
 import { availableQuestions } from "../constants";
@@ -7,7 +7,7 @@ interface QuestionFormProps {
   questions: SecurityQuestion[];
   onQuestionChange: (id: string, value: string) => void;
   onAnswerChange: (id: string, value: string) => void;
-  onAddQuestion: () => void;
+  onAddQuestion: () => string | undefined;
   onRemoveQuestion: (id: string) => void;
   getAvailableQuestionsForId: (id: string) => string[];
   isStepComplete: boolean;
@@ -30,6 +30,23 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   onImportProfile,
   onDownloadProfile,
 }) => {
+  const lastAddedRef = useRef<string | null>(null);
+  const selectRefs = useRef<{ [key: string]: HTMLSelectElement | null }>({});
+
+  useEffect(() => {
+    if (lastAddedRef.current && selectRefs.current[lastAddedRef.current]) {
+      selectRefs.current[lastAddedRef.current]?.focus();
+      lastAddedRef.current = null;
+    }
+  }, [questions]);
+
+  const handleAddQuestion = () => {
+    const newId = onAddQuestion();
+    if (newId) {
+      lastAddedRef.current = newId;
+    }
+  };
+
   return (
     <div className="h-full flex flex-col md:flex-row">
       <div className="flex-1 flex flex-col min-h-0">
@@ -50,6 +67,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 >
                   <div className="flex gap-2">
                     <select
+                      ref={(el) => (selectRefs.current[q.id] = el)}
                       value={q.question}
                       onChange={(e) => onQuestionChange(q.id, e.target.value)}
                       className="w-full mr-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -59,7 +77,6 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                           {question}
                         </option>
                       ))}
-                      {/* Always include the currently selected question */}
                       {!getAvailableQuestionsForId(q.id).includes(
                         q.question
                       ) && (
@@ -90,8 +107,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
             {questions.length < 10 && (
               <button
-                onClick={onAddQuestion}
-                className="flex items-center text-indigo-600 hover:text-indigo-800"
+                onClick={handleAddQuestion}
+                className="flex items-center text-indigo-600 hover:text-indigo-800 mt-4"
               >
                 <Plus size={18} className="mr-1" />
                 Add Another Question
