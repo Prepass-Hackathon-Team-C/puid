@@ -4,6 +4,7 @@ import { Copy, Check, Info } from "lucide-react";
 interface ReviewPageProps {
   puid: string;
   prefixCode: string;
+  prefixError: string | null;
   copied: boolean;
   onPrefixChange: (value: string) => void;
   onGeneratePUID: () => void;
@@ -15,6 +16,7 @@ interface ReviewPageProps {
 export const ReviewPage: React.FC<ReviewPageProps> = ({
   puid,
   prefixCode,
+  prefixError,
   copied,
   onPrefixChange,
   onGeneratePUID,
@@ -72,21 +74,30 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
             </div>
           </label>
           <div className="flex gap-4">
-            <input
-              type="text"
-              id="prefixCode"
-              value={prefixCode}
-              onChange={(e) => onPrefixChange(e.target.value)}
-              maxLength={5}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter prefix code"
-              required
-            />
+            <div className="flex-1">
+              <input
+                type="text"
+                id="prefixCode"
+                value={prefixCode}
+                onChange={(e) => onPrefixChange(e.target.value)}
+                maxLength={5}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  prefixError ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter prefix code"
+                required
+              />
+              {prefixError && (
+                <p className="mt-1 text-sm text-red-600">{prefixError}</p>
+              )}
+            </div>
             <button
               onClick={onGeneratePUID}
-              disabled={!prefixCode || prefixCode.length > 5}
+              disabled={
+                !prefixCode || prefixCode.length > 5 || prefixError !== null
+              }
               className={`px-4 py-2 rounded-md text-white ${
-                !prefixCode || prefixCode.length > 5
+                !prefixCode || prefixCode.length > 5 || prefixError !== null
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-indigo-600 hover:bg-indigo-700"
               }`}

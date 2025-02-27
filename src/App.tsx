@@ -13,6 +13,7 @@ function App() {
   const [currentStep, setCurrentStep] = useState<Step>("questions");
   const [prefixCode, setPrefixCode] = useState("");
   const [nextQuestionId, setNextQuestionId] = useState(2); // Start at 2 since we have one initial question
+  const [prefixError, setPrefixError] = useState<string | null>(null);
 
   // Modify questions state to load from localStorage
   const [questions, setQuestions] = useState<SecurityQuestion[]>(() => {
@@ -21,6 +22,17 @@ function App() {
       ? JSON.parse(savedQuestions)
       : [{ id: "1", question: availableQuestions[0], answer: "" }];
   });
+
+  // Track used prefix codes
+  const [usedPrefixCodes, setUsedPrefixCodes] = useState<string[]>(() => {
+    const savedPrefixes = localStorage.getItem("puid-used-prefixes");
+    return savedPrefixes ? JSON.parse(savedPrefixes) : [];
+  });
+
+  // Save used prefix codes whenever they change
+  useEffect(() => {
+    localStorage.setItem("puid-used-prefixes", JSON.stringify(usedPrefixCodes));
+  }, [usedPrefixCodes]);
 
   // Add effect to save questions whenever they change
   useEffect(() => {
@@ -211,8 +223,19 @@ function App() {
     }
   };
 
+  // Handle prefix code change with validation
+  const handlePrefixChange = (value: string) => {
+    setPrefixCode(value);
+    if (usedPrefixCodes.includes(value)) {
+      setPrefixError("This prefix code has already been used");
+    } else {
+      setPrefixError(null);
+    }
+  };
+
   // Handle PUID acceptance
   const handleAcceptPUID = () => {
+    setUsedPrefixCodes([...usedPrefixCodes, prefixCode]);
     setPrefixCode("");
   };
 
@@ -221,9 +244,10 @@ function App() {
     setPuid("");
     setPrefixCode("");
     setCopied(false);
+    setPrefixError(null);
   };
 
-  // Modify renderStepContent to pass the new import handler
+  // Modify renderStepContent to pass the new props
   const renderStepContent = () => {
     switch (currentStep) {
       case "questions":
@@ -247,8 +271,9 @@ function App() {
           <ReviewPage
             puid={puid}
             prefixCode={prefixCode}
+            prefixError={prefixError}
             copied={copied}
-            onPrefixChange={setPrefixCode}
+            onPrefixChange={handlePrefixChange}
             onGeneratePUID={handleGeneratePUID}
             onCopyPUID={copyPUID}
             onAcceptPUID={handleAcceptPUID}
