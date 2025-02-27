@@ -47,8 +47,25 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
         >
           Create New Password
         </button>
-        <div className="bg-white border-2 border-green-500 rounded-lg px-4 py-3">
-          <div className="font-mono text-lg break-all">{puid}</div>
+        <div className="space-y-1">
+          <div className="flex gap-2 items-center">
+            <div className="flex-1 bg-white border-2 border-green-500 rounded-lg px-4 py-3">
+              <div className="font-mono text-lg break-all">{puid}</div>
+            </div>
+            <button
+              onClick={onCopyPUID}
+              className="text-indigo-600 hover:text-indigo-800 p-2"
+              aria-label="Copy PUID"
+            >
+              <Copy size={18} />
+            </button>
+          </div>
+          {copied && (
+            <div className="text-sm text-green-600 flex items-center pl-1">
+              <Check size={16} className="mr-1" />
+              PUID copied to clipboard!
+            </div>
+          )}
         </div>
       </div>
     );
@@ -112,42 +129,26 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
         </div>
 
         {puid && (
-          <>
-            <div className="flex gap-2 items-center">
-              <div className="flex-1 bg-white border border-indigo-300 rounded-lg px-4 py-3 font-mono text-lg break-all">
-                {puid}
-              </div>
-              <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <div className="flex-1 bg-white border border-indigo-300 rounded-lg px-4 py-3 font-mono text-lg break-all">
+              {puid}
+            </div>
+            <div className="flex gap-2">
+              <div className="relative group">
                 <button
-                  onClick={onCopyPUID}
+                  onClick={handleAccept}
                   className="text-indigo-600 hover:text-indigo-800 p-2"
-                  aria-label="Copy PUID"
+                  aria-label="Accept PUID"
                 >
-                  <Copy size={18} />
+                  <Check size={18} />
                 </button>
-                <div className="relative group">
-                  <button
-                    onClick={handleAccept}
-                    className="text-indigo-600 hover:text-indigo-800 p-2"
-                    aria-label="Accept PUID"
-                  >
-                    <Check size={18} />
-                  </button>
-                  <div className="absolute right-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    Accept the password
-                    <div className="absolute right-4 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
-                  </div>
+                <div className="absolute right-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Accept the password
+                  <div className="absolute right-4 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
             </div>
-
-            {copied && (
-              <div className="mt-2 text-sm text-green-600 flex items-center">
-                <Check size={16} className="mr-1" />
-                PUID copied to clipboard!
-              </div>
-            )}
-          </>
+          </div>
         )}
 
         <div className="mt-4">
