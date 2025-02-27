@@ -10,7 +10,14 @@ import { NavigationButtons } from "./components/NavigationButtons";
 
 function App() {
   // Current step state
-  const [currentStep, setCurrentStep] = useState<Step>("questions");
+  const [currentStep, setCurrentStep] = useState<Step>(() => {
+    const savedProfile = localStorage.getItem("puid-profile");
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      return profile.questions.length >= 5 ? "review" : "questions";
+    }
+    return "questions";
+  });
   const [prefixCode, setPrefixCode] = useState("");
   const [nextQuestionId, setNextQuestionId] = useState(2); // Start at 2 since we have one initial question
   const [prefixError, setPrefixError] = useState<string | null>(null);
