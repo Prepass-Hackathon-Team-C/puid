@@ -99,12 +99,6 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       </div>
 
       <div className="mt-6 md:mt-0 md:ml-6 flex flex-row flex-wrap md:flex-col justify-end items-stretch gap-4 md:w-auto w-full">
-        <button
-          onClick={onDownloadProfile}
-          className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center"
-        >
-          Export
-        </button>
         <label className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center cursor-pointer">
           Import
           <input
@@ -117,6 +111,12 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
             }}
           />
         </label>
+        <button
+          onClick={onDownloadProfile}
+          className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+        >
+          Export
+        </button>
         <button
           onClick={onStartOver}
           className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center"
