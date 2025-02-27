@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Shield } from "lucide-react";
-import { Step, SecurityQuestion } from "./types";
+import { Step, SecurityQuestion, Profile } from "./types";
 import { availableQuestions } from "./constants";
 import { generatePUID } from "./utils/puidGenerator";
 import { ProgressBar } from "./components/ProgressBar";
@@ -13,23 +13,26 @@ function App() {
   const [currentStep, setCurrentStep] = useState<Step>("questions");
   const [prefixCode, setPrefixCode] = useState("");
   const [nextQuestionId, setNextQuestionId] = useState(2); // Start at 2 since we have one initial question
+  const [prefixError, setPrefixError] = useState<string | null>(null);
 
-  // Modify questions state to load from localStorage
-  const [questions, setQuestions] = useState<SecurityQuestion[]>(() => {
-    const savedQuestions = localStorage.getItem("puid-questions");
-    return savedQuestions
-      ? JSON.parse(savedQuestions)
-      : [{ id: "1", question: availableQuestions[0], answer: "" }];
+  // Load profile from localStorage
+  const [profile, setProfile] = useState<Profile>(() => {
+    const savedProfile = localStorage.getItem("puid-profile");
+    return savedProfile
+      ? JSON.parse(savedProfile)
+      : {
+          questions: [{ id: "1", question: availableQuestions[0], answer: "" }],
+          usedPrefixCodes: [],
+        };
   });
 
-  // Add effect to save questions whenever they change
-  useEffect(() => {
-    localStorage.setItem("puid-questions", JSON.stringify(questions));
-  }, [questions]);
+  // Extract questions and usedPrefixCodes from profile
+  const { questions, usedPrefixCodes } = profile;
 
-  // PUID state
-  const [puid, setPuid] = useState("");
-  const [copied, setCopied] = useState(false);
+  // Save profile whenever it changes
+  useEffect(() => {
+    localStorage.setItem("puid-profile", JSON.stringify(profile));
+  }, [profile]);
 
   // Add this state near other state declarations
   const [minimumLength, setMinimumLength] = useState(8);
@@ -54,22 +57,29 @@ function App() {
           (q) => !questions.map((existing) => existing.question).includes(q)
         ) || availableQuestions[0];
 
-      setQuestions([
-        ...questions,
-        { id: newId, question: availableQuestion, answer: "" },
-      ]);
+      setProfile({
+        ...profile,
+        questions: [
+          ...questions,
+          { id: newId, question: availableQuestion, answer: "" },
+        ],
+      });
     }
   };
 
   // Remove question
   const removeQuestion = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id));
+    setProfile({
+      ...profile,
+      questions: questions.filter((q) => q.id !== id),
+    });
   };
 
   // Handle question change
   const handleQuestionChange = (id: string, value: string) => {
-    setQuestions(
-      questions.map((q) => {
+    setProfile({
+      ...profile,
+      questions: questions.map((q) => {
         if (q.id === id) {
           return { ...q, question: value };
         }
@@ -81,16 +91,23 @@ function App() {
           return { ...q, question: oldQuestion };
         }
         return q;
-      })
-    );
+      }),
+    });
   };
 
   // Handle answer change
   const handleAnswerChange = (id: string, value: string) => {
-    setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, answer: value } : q))
-    );
+    setProfile({
+      ...profile,
+      questions: questions.map((q) =>
+        q.id === id ? { ...q, answer: value } : q
+      ),
+    });
   };
+
+  // PUID state
+  const [puid, setPuid] = useState("");
+  const [copied, setCopied] = useState(false);
 
   // Check if current step is complete
   const isStepComplete = () => {
@@ -110,12 +127,21 @@ function App() {
 
   // Handle step change
   const handleStepChange = (step: Step) => {
+    if (step === "questions") {
+      // Reset password generation state when going back to profile
+      setPuid("");
+      setPrefixCode("");
+      setCopied(false);
+    }
     setCurrentStep(step);
   };
 
   // Handle start over
   const handleStartOver = () => {
-    setQuestions([{ id: "1", question: availableQuestions[0], answer: "" }]);
+    setProfile({
+      questions: [{ id: "1", question: availableQuestions[0], answer: "" }],
+      usedPrefixCodes: [],
+    });
     setCurrentStep("questions");
   };
 
@@ -125,11 +151,35 @@ function App() {
     setPuid(newPuid);
   };
 
+  // Handle prefix code change with validation
+  const handlePrefixChange = (value: string) => {
+    setPrefixCode(value);
+    if (usedPrefixCodes.includes(value)) {
+      setPrefixError("This prefix code has already been used");
+    } else {
+      setPrefixError(null);
+    }
+  };
+
+  // Handle PUID acceptance
+  const handleAcceptPUID = () => {
+    setProfile({
+      ...profile,
+      usedPrefixCodes: [...usedPrefixCodes, prefixCode],
+    });
+    setPrefixCode("");
+  };
+
+  // Handle resetting password generation
+  const handleResetGeneration = () => {
+    setPuid("");
+    setPrefixCode("");
+    setCopied(false);
+    setPrefixError(null);
+  };
+
   // Add new download function
   const handleDownloadProfile = async () => {
-    const questionsData = localStorage.getItem("puid-questions");
-    if (!questionsData) return;
-
     try {
       // Check if the File System Access API is available
       if ("showSaveFilePicker" in window) {
@@ -146,11 +196,13 @@ function App() {
         });
 
         const writable = await fileHandle.createWritable();
-        await writable.write(questionsData);
+        await writable.write(JSON.stringify(profile));
         await writable.close();
       } else {
         // Fallback for browsers that don't support File System Access API
-        const blob = new Blob([questionsData], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(profile)], {
+          type: "application/json",
+        });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -163,7 +215,9 @@ function App() {
     } catch (err) {
       console.error("Failed to save file:", err);
       // Fallback to the original method if the user cancels or there's an error
-      const blob = new Blob([questionsData], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(profile)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -181,26 +235,29 @@ function App() {
       const fileContent = await file.text();
       const importedData = JSON.parse(fileContent);
 
-      if (Array.isArray(importedData) && importedData.length > 0) {
-        // Validate that imported data has the correct structure
-        const isValidData = importedData.every(
+      // Validate that imported data has the correct structure
+      if (
+        typeof importedData === "object" &&
+        Array.isArray(importedData.questions) &&
+        Array.isArray(importedData.usedPrefixCodes) &&
+        importedData.questions.every(
           (item: any) =>
             typeof item === "object" &&
             "id" in item &&
             "question" in item &&
             "answer" in item
+        )
+      ) {
+        setProfile(importedData);
+        // Update nextQuestionId to be higher than any existing id
+        const maxId = Math.max(
+          ...importedData.questions.map((q: SecurityQuestion) => parseInt(q.id))
         );
-
-        if (isValidData) {
-          setQuestions(importedData);
-          // Update nextQuestionId to be higher than any existing id
-          const maxId = Math.max(...importedData.map((q) => parseInt(q.id)));
-          setNextQuestionId(maxId + 1);
-        } else {
-          alert(
-            "Invalid file format. Please use a valid PUID profile JSON file."
-          );
-        }
+        setNextQuestionId(maxId + 1);
+      } else {
+        alert(
+          "Invalid file format. Please use a valid PUID profile JSON file."
+        );
       }
     } catch (err) {
       console.error("Failed to import file:", err);
@@ -208,7 +265,7 @@ function App() {
     }
   };
 
-  // Modify renderStepContent to pass the new import handler
+  // Modify renderStepContent to pass the new props
   const renderStepContent = () => {
     switch (currentStep) {
       case "questions":
@@ -232,12 +289,15 @@ function App() {
           <ReviewPage
             puid={puid}
             prefixCode={prefixCode}
+            prefixError={prefixError}
             copied={copied}
             minLength={minimumLength}
             onMinLengthChange={setMinimumLength}
-            onPrefixChange={setPrefixCode}
+            onPrefixChange={handlePrefixChange}
             onGeneratePUID={handleGeneratePUID}
             onCopyPUID={copyPUID}
+            onAcceptPUID={handleAcceptPUID}
+            onStartOver={handleResetGeneration}
           />
         );
       default:
