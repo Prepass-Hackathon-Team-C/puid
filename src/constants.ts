@@ -22,6 +22,8 @@ export const separators = ["-", "_", ".", "~", "+", "*", "#", "@"];
 
 // Character replacements for PUID generation
 export const numberReplacements: { [key: string]: string } = {
+  b: "8",
+  s: "5",
   a: "4",
   e: "3",
   i: "1",
