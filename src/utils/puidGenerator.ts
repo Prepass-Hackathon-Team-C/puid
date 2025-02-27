@@ -1,7 +1,7 @@
 import { SecurityQuestion } from '../types';
 import { separators, numberReplacements } from '../constants';
 
-export const generatePUID = (questions: SecurityQuestion[], prefixCode: string): string => {
+export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, minimumLength: number): string => {
   // Choose one random separator to use throughout
   const selectedSeparator =
     separators[Math.floor(Math.random() * separators.length)];
@@ -16,20 +16,22 @@ export const generatePUID = (questions: SecurityQuestion[], prefixCode: string):
     .flatMap((answer) => answer.split(/\s+/))
     .filter((word) => word.length > 0);
 
-  // Shuffle the words
-  const shuffledWords = [...words].sort(() => Math.random() - 0.5);
 
   // Select enough words to reach target length (12-20 chars)
   const selectedWords: string[] = [];
   let totalLength = 0;
-  const minLength = 12;
-  const maxLength = 20;
+  const minLength = minimumLength;
+  const maxLength = minimumLength + 10;
 
-  for (const word of shuffledWords) {
-    if (totalLength + word.length <= maxLength) {
-      selectedWords.push(word);
-      totalLength += word.length;
-      if (totalLength >= minLength) break;
+  while (totalLength < minLength) {
+    // Shuffle the words
+    const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+    for (const word of shuffledWords) {
+      if (totalLength + word.length <= maxLength) {
+        selectedWords.push(word);
+        totalLength += word.length;
+        if (totalLength >= minLength) break;
+      }
     }
   }
 
