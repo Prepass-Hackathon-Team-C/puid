@@ -154,25 +154,24 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
         <div className="mt-4">
           <label
             htmlFor="minLength"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"
+            className="flex justify-between items-center text-sm mb-1"
           >
-            Minimum Length
-            <div className="relative group">
-              <Info
-                size={14}
-                className="text-gray-400 hover:text-gray-600 cursor-help"
-              />
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                The minimum length of the password
-                <div className="absolute left-1/2 -translate-x-1/2 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
+            <div className="font-medium text-gray-700 flex items-center gap-1">
+              Minimum Length
+              <div className="relative group">
+                <Info
+                  size={14}
+                  className="text-gray-400 hover:text-gray-600 cursor-help"
+                />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  The minimum length of the password
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                </div>
               </div>
             </div>
+            <span className="text-gray-600">{minLength} characters</span>
           </label>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>Minimum Length: {minLength}</span>
-              <span>{minLength} characters</span>
-            </div>
             <input
               type="range"
               id="minLength"
