@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Copy, Check, Info } from "lucide-react";
 
 interface ReviewPageProps {
@@ -35,26 +35,11 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   availableSpecialChars,
 }) => {
   const [isAccepted, setIsAccepted] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleAccept = () => {
     setIsAccepted(true);
     onAcceptPUID();
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (isDropdownOpen && 
-          !target.closest('.special-chars-dropdown') && 
-          !target.closest('.special-chars-content')) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isDropdownOpen]);
 
   if (isAccepted) {
     return (
@@ -228,71 +213,40 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
               </div>
             </div>
           </label>
-          <div className="relative">
-            <div
-              className="min-h-[42px] w-full px-3 py-2 border border-gray-300 rounded-md bg-white cursor-pointer flex flex-wrap gap-1 special-chars-dropdown"
-              onClick={(e) => {
-                if (isDropdownOpen && e.target.closest('.special-chars-dropdown')) {
-                  setIsDropdownOpen(false);
+          <div className="flex flex-wrap gap-2">
+            <button
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                ${allowedSpecialChars.length === availableSpecialChars.length 
+                  ? 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              onClick={() => {
+                if (allowedSpecialChars.length === availableSpecialChars.length) {
+                  onSpecialCharsChange([]);
                 } else {
-                  setIsDropdownOpen(true);
+                  onSpecialCharsChange([...availableSpecialChars]);
                 }
               }}
             >
-              {allowedSpecialChars.length > 0 ? (
-                allowedSpecialChars.map((char) => (
-                  <span
-                    key={char}
-                    className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-sm"
-                  >
-                    {char}
-                  </span>
-                ))
-              ) : (
-                <span className="text-gray-500">Select special characters...</span>
-              )}
-            </div>
-            {isDropdownOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto special-chars-content">
-                <label className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-200">
-                  <input
-                    type="checkbox"
-                    checked={allowedSpecialChars.length === availableSpecialChars.length}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        onSpecialCharsChange([...availableSpecialChars]);
-                      } else {
-                        onSpecialCharsChange([]);
-                      }
-                    }}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                  <span className="ml-3">Select All</span>
-                </label>
-                {availableSpecialChars.map((char) => (
-                  <label
-                    key={char}
-                    className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={allowedSpecialChars.includes(char)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          onSpecialCharsChange([...allowedSpecialChars, char]);
-                        } else {
-                          onSpecialCharsChange(
-                            allowedSpecialChars.filter((c) => c !== char)
-                          );
-                        }
-                      }}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-3">{char}</span>
-                  </label>
-                ))}
-              </div>
-            )}
+              {allowedSpecialChars.length === availableSpecialChars.length ? 'Clear All' : 'Select All'}
+            </button>
+            {availableSpecialChars.map((char) => (
+              <button
+                key={char}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                  ${allowedSpecialChars.includes(char)
+                    ? 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                onClick={() => {
+                  if (allowedSpecialChars.includes(char)) {
+                    onSpecialCharsChange(allowedSpecialChars.filter((c) => c !== char));
+                  } else {
+                    onSpecialCharsChange([...allowedSpecialChars, char]);
+                  }
+                }}
+              >
+                {char}
+              </button>
+            ))}
           </div>
         </div>
       </div>
