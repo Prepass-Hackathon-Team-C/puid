@@ -1,23 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import { Copy, Check, Info } from "lucide-react";
 
 interface ReviewPageProps {
   puid: string;
   prefixCode: string;
+  prefixError: string | null;
   copied: boolean;
   onPrefixChange: (value: string) => void;
   onGeneratePUID: () => void;
   onCopyPUID: () => void;
+  onAcceptPUID: () => void;
+  onStartOver: () => void;
 }
 
 export const ReviewPage: React.FC<ReviewPageProps> = ({
   puid,
   prefixCode,
+  prefixError,
   copied,
   onPrefixChange,
   onGeneratePUID,
   onCopyPUID,
+  onAcceptPUID,
+  onStartOver,
 }) => {
+  const [isAccepted, setIsAccepted] = useState(false);
+
+  const handleAccept = () => {
+    setIsAccepted(true);
+    onAcceptPUID();
+  };
+
+  if (isAccepted) {
+    return (
+      <div className="space-y-8">
+        <button
+          onClick={() => {
+            setIsAccepted(false);
+            onStartOver();
+          }}
+          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2"
+        >
+          Create New Password
+        </button>
+        <div className="bg-white border-2 border-green-500 rounded-lg px-4 py-3">
+          <div className="font-mono text-lg break-all">{puid}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <h2 className="text-xl font-semibold text-gray-900">
@@ -42,21 +74,30 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
             </div>
           </label>
           <div className="flex gap-4">
-            <input
-              type="text"
-              id="prefixCode"
-              value={prefixCode}
-              onChange={(e) => onPrefixChange(e.target.value)}
-              maxLength={5}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter prefix code"
-              required
-            />
+            <div className="flex-1">
+              <input
+                type="text"
+                id="prefixCode"
+                value={prefixCode}
+                onChange={(e) => onPrefixChange(e.target.value)}
+                maxLength={5}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  prefixError ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter prefix code"
+                required
+              />
+              {prefixError && (
+                <p className="mt-1 text-sm text-red-600">{prefixError}</p>
+              )}
+            </div>
             <button
               onClick={onGeneratePUID}
-              disabled={!prefixCode || prefixCode.length > 5}
+              disabled={
+                !prefixCode || prefixCode.length > 5 || prefixError !== null
+              }
               className={`px-4 py-2 rounded-md text-white ${
-                !prefixCode || prefixCode.length > 5
+                !prefixCode || prefixCode.length > 5 || prefixError !== null
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-indigo-600 hover:bg-indigo-700"
               }`}
@@ -72,13 +113,28 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
               <div className="flex-1 bg-white border border-indigo-300 rounded-lg px-4 py-3 font-mono text-lg break-all">
                 {puid}
               </div>
-              <button
-                onClick={onCopyPUID}
-                className="text-indigo-600 hover:text-indigo-800 p-2"
-                aria-label="Copy PUID"
-              >
-                <Copy size={18} />
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={onCopyPUID}
+                  className="text-indigo-600 hover:text-indigo-800 p-2"
+                  aria-label="Copy PUID"
+                >
+                  <Copy size={18} />
+                </button>
+                <div className="relative group">
+                  <button
+                    onClick={handleAccept}
+                    className="text-indigo-600 hover:text-indigo-800 p-2"
+                    aria-label="Accept PUID"
+                  >
+                    <Check size={18} />
+                  </button>
+                  <div className="absolute right-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    Accept the password
+                    <div className="absolute right-4 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {copied && (
