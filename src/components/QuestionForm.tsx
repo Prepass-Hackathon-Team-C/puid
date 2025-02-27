@@ -13,6 +13,8 @@ interface QuestionFormProps {
   isStepComplete: boolean;
   onStepChange: (step: "review") => void;
   onStartOver: () => void;
+  onImportProfile: (file: File) => Promise<void>;
+  onDownloadProfile: () => Promise<void>;
 }
 
 export const QuestionForm: React.FC<QuestionFormProps> = ({
@@ -25,6 +27,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   isStepComplete,
   onStepChange,
   onStartOver,
+  onImportProfile,
+  onDownloadProfile,
 }) => {
   return (
     <div className="h-full flex">
@@ -96,10 +100,28 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
       <div className="ml-6 flex flex-col justify-end gap-4">
         <button
+          onClick={onDownloadProfile}
+          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center"
+        >
+          Export
+        </button>
+        <label className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center cursor-pointer">
+          Import
+          <input
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onImportProfile(file);
+            }}
+          />
+        </label>
+        <button
           onClick={onStartOver}
           className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center"
         >
-          Clear Profile
+          Clear
         </button>
         <button
           onClick={() => onStepChange("review")}

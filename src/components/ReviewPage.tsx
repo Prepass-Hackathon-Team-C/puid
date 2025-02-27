@@ -8,7 +8,6 @@ interface ReviewPageProps {
   onPrefixChange: (value: string) => void;
   onGeneratePUID: () => void;
   onCopyPUID: () => void;
-  onDownloadProfile: () => void;
 }
 
 export const ReviewPage: React.FC<ReviewPageProps> = ({
@@ -18,7 +17,6 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   onPrefixChange,
   onGeneratePUID,
   onCopyPUID,
-  onDownloadProfile,
 }) => {
   return (
     <div className="space-y-8">
@@ -43,7 +41,7 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
               </div>
             </div>
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <input
               type="text"
               id="prefixCode"
@@ -91,15 +89,6 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
             )}
           </>
         )}
-      </div>
-
-      <div className="mt-4 flex gap-2">
-        <button
-          onClick={onDownloadProfile}
-          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-        >
-          Download PUID Profile
-        </button>
       </div>
     </div>
   );
