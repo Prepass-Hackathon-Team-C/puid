@@ -103,7 +103,7 @@ function App() {
     setProfile({
       ...profile,
       questions: questions.map((q) =>
-        q.id === id ? { ...q, answer: value } : q
+        q.id === id ? { ...q, answer: value.slice(0, 20) } : q
       ),
     });
   };
