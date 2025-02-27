@@ -32,6 +32,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 }) => {
   const lastAddedRef = useRef<string | null>(null);
   const selectRefs = useRef<{ [key: string]: HTMLSelectElement | null }>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (lastAddedRef.current && selectRefs.current[lastAddedRef.current]) {
@@ -44,6 +45,13 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     const newId = onAddQuestion();
     if (newId) {
       lastAddedRef.current = newId;
+    }
+  };
+
+  const handleImport = async (file: File) => {
+    await onImportProfile(file);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -122,12 +130,13 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         <label className="basis-[calc(50%-0.5rem)] md:basis-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center cursor-pointer">
           Import
           <input
+            ref={fileInputRef}
             type="file"
             accept=".json"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) onImportProfile(file);
+              if (file) handleImport(file);
             }}
           />
         </label>
