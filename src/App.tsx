@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Shield } from "lucide-react";
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
 import { Step, SecurityQuestion, Profile } from "./types";
 import { availableQuestions } from "./constants";
 import { generatePUID } from "./utils/puidGenerator";
@@ -7,6 +9,9 @@ import { ProgressBar } from "./components/ProgressBar";
 import { QuestionForm } from "./components/QuestionForm";
 import { ReviewPage } from "./components/ReviewPage";
 import { NavigationButtons } from "./components/NavigationButtons";
+
+// Update Step type in types.ts or add it here
+type Step = "questions" | "review" | "api-docs";
 
 function App() {
   // Current step state
@@ -300,6 +305,12 @@ function App() {
             onStartOver={handleResetGeneration}
           />
         );
+      case "api-docs":
+        return (
+          <div className="w-full h-full">
+            <SwaggerUI url="/swagger.json" />
+          </div>
+        );
       default:
         return null;
     }
@@ -313,6 +324,12 @@ function App() {
             <h1 className="text-2xl font-bold flex items-center justify-center">
               <Shield className="mr-2" />
               PUID
+              <button 
+                onClick={() => setCurrentStep("api-docs")}
+                className="ml-4 px-3 py-1 text-sm bg-white text-indigo-600 rounded-md hover:bg-indigo-50"
+              >
+                API Docs
+              </button>
             </h1>
           </div>
 

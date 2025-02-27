@@ -1,0 +1,55 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PUID API",
+    "description": "API documentation for PUID generation service",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/generate": {
+      "post": {
+        "summary": "Generate a PUID",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "question": { "type": "string" },
+                        "answer": { "type": "string" }
+                      }
+                    }
+                  },
+                  "prefixCode": { "type": "string" },
+                  "minimumLength": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PUID generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "puid": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
