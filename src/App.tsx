@@ -107,6 +107,12 @@ function App() {
 
   // Handle step change
   const handleStepChange = (step: Step) => {
+    if (step === "questions") {
+      // Reset password generation state when going back to profile
+      setPuid("");
+      setPrefixCode("");
+      setCopied(false);
+    }
     setCurrentStep(step);
   };
 
@@ -205,6 +211,18 @@ function App() {
     }
   };
 
+  // Handle PUID acceptance
+  const handleAcceptPUID = () => {
+    setPrefixCode("");
+  };
+
+  // Handle resetting password generation
+  const handleResetGeneration = () => {
+    setPuid("");
+    setPrefixCode("");
+    setCopied(false);
+  };
+
   // Modify renderStepContent to pass the new import handler
   const renderStepContent = () => {
     switch (currentStep) {
@@ -233,6 +251,8 @@ function App() {
             onPrefixChange={setPrefixCode}
             onGeneratePUID={handleGeneratePUID}
             onCopyPUID={copyPUID}
+            onAcceptPUID={handleAcceptPUID}
+            onStartOver={handleResetGeneration}
           />
         );
       default:

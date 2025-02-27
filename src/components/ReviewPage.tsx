@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Copy, Check, Info } from "lucide-react";
 
 interface ReviewPageProps {
@@ -8,6 +8,8 @@ interface ReviewPageProps {
   onPrefixChange: (value: string) => void;
   onGeneratePUID: () => void;
   onCopyPUID: () => void;
+  onAcceptPUID: () => void;
+  onStartOver: () => void;
 }
 
 export const ReviewPage: React.FC<ReviewPageProps> = ({
@@ -17,7 +19,35 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   onPrefixChange,
   onGeneratePUID,
   onCopyPUID,
+  onAcceptPUID,
+  onStartOver,
 }) => {
+  const [isAccepted, setIsAccepted] = useState(false);
+
+  const handleAccept = () => {
+    setIsAccepted(true);
+    onAcceptPUID();
+  };
+
+  if (isAccepted) {
+    return (
+      <div className="space-y-8">
+        <button
+          onClick={() => {
+            setIsAccepted(false);
+            onStartOver();
+          }}
+          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2"
+        >
+          Create New Password
+        </button>
+        <div className="bg-white border-2 border-green-500 rounded-lg px-4 py-3">
+          <div className="font-mono text-lg break-all">{puid}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <h2 className="text-xl font-semibold text-gray-900">
@@ -72,13 +102,28 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
               <div className="flex-1 bg-white border border-indigo-300 rounded-lg px-4 py-3 font-mono text-lg break-all">
                 {puid}
               </div>
-              <button
-                onClick={onCopyPUID}
-                className="text-indigo-600 hover:text-indigo-800 p-2"
-                aria-label="Copy PUID"
-              >
-                <Copy size={18} />
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={onCopyPUID}
+                  className="text-indigo-600 hover:text-indigo-800 p-2"
+                  aria-label="Copy PUID"
+                >
+                  <Copy size={18} />
+                </button>
+                <div className="relative group">
+                  <button
+                    onClick={handleAccept}
+                    className="text-indigo-600 hover:text-indigo-800 p-2"
+                    aria-label="Accept PUID"
+                  >
+                    <Check size={18} />
+                  </button>
+                  <div className="absolute right-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    Accept the password
+                    <div className="absolute right-4 top-full -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {copied && (
