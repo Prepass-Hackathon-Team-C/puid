@@ -36,8 +36,6 @@ export const generatePUID = (questions: SecurityQuestion[], prefixCode: string, 
     }
   }
 
-  console.log(selectedWords);
-
   // Convert to lowercase
   let processedWords = selectedWords.map((word) => word.toLowerCase());
 
